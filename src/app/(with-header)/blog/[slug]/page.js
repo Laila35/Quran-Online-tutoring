@@ -1,6 +1,6 @@
 import { createClient } from "../../../../prismicio";
 import { notFound } from "next/navigation";
-import Details from "../../../components/blog/Details";
+import Details from "../../../components/blog/Details.jsx";
 import { asText } from "@prismicio/helpers";
 
 // ✅ Disable dynamic rendering for static generation
