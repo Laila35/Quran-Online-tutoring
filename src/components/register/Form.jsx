@@ -1,5 +1,6 @@
  
-import ContactForm from '../ContactForm-register'
+import ContactFormRegister from '../ContactForm-register.jsx'
+
 
 
 export default function RegesterForm({ scrollRef }) {
