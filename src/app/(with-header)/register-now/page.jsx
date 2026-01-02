@@ -1,4 +1,5 @@
-import MainRegister from "../../components/register/Main.jsx";
+import MainRegister from "@/components/register/Main";
+
 
 // ✅ SEO Meta Configuration
 export const metadata = {

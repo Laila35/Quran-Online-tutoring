@@ -1,5 +1,8 @@
 'use client'
-import { Container } from "../../../shared/Container"
+import { Container } from '../shared/Container.jsx'
+
+
+
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPhone, faEnvelope } from '@fortawesome/free-solid-svg-icons'
 

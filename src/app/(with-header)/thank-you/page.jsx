@@ -1,7 +1,9 @@
 import Link from "next/link";
 import { FaCheckCircle, FaEnvelope, FaPhone } from "react-icons/fa";
 import React from "react";
-import BackgroundBeams from '../../components/ui/background-beams.jsx'
+import { BackgroundBeams } from '@/components/ui/background-beams'
+
+
 
 export const metadata = {
   title: 'Thank You | Quran ',

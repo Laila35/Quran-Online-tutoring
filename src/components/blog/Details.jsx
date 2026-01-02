@@ -1,7 +1,10 @@
-import { components } from '../../../slices';
+import { components } from "@/slices";
+
 import { PrismicNextImage } from "@prismicio/next";
-import SocialShare from '../../shared/SocialShare';
-import ContactFormRegister from '../../ContactForm-register'; 
+import SocialShare from '../shared/SocialShare.jsx'
+import ContactFormRegister from '../ContactForm-register.jsx'
+
+
 import { SliceZone } from '@prismicio/react';
 
 const Details = ({post,postUrl}) => {

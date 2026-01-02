@@ -1,5 +1,6 @@
 // app/[category]/[slug]/page.js
-import { createClient } from "../../../../../prismicio";
+import { createClient } from "@/prismicio";
+
 import { notFound } from "next/navigation";
 import { asText } from "@prismicio/helpers";
 import Script from "next/script";
