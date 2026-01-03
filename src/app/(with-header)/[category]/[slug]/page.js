@@ -3,6 +3,7 @@ import { createClient } from "@/prismicio";
 import { notFound } from "next/navigation";
 import { asText } from "@prismicio/helpers";
 import Script from "next/script";
+
 import Testimonial from "../../../../components/shared/Testimonial";
 import ChildHero from "../../../../components/services/child/Hero";
 import ChildCta from "../../../../components/services/child/Cta";
@@ -12,20 +13,23 @@ import ChildCourses from "../../../../components/services/ChildCourses";
 import SessionStructure from "../../../../components/shared/SessionStructure";
 import ChildFeatures from "../../../../components/services/child/ChildFeatures";
 
+// 🔥 THIS LINE IS THE KEY FIX
+export const dynamic = "force-dynamic";
+
 const siteUrl = "https://quranonlinetutoring.com";
 
-// ✅ Generate all static paths at build
-export async function generateStaticParams() {
-  const client = createClient();
-  const docs = await client.getAllByType("childcourses");
+// ❌ REMOVE STATIC PARAMS (VERY IMPORTANT)
+// export async function generateStaticParams() {
+//   const client = createClient();
+//   const docs = await client.getAllByType("childcourses");
 
-  return docs.map((doc) => ({
-    category: doc.data.category || "courses",
-    slug: doc.uid,
-  }));
-}
+//   return docs.map((doc) => ({
+//     category: doc.data.category || "courses",
+//     slug: doc.uid,
+//   }));
+// }
 
-// ✅ Metadata SSG
+// ✅ Metadata (still safe)
 export async function generateMetadata({ params }) {
   const { category, slug } = params;
   const client = createClient();
@@ -33,10 +37,10 @@ export async function generateMetadata({ params }) {
   try {
     const data = await client.getByUID("childcourses", slug);
 
-    if (!data || !data.data) {
+    if (!data?.data) {
       return {
         title: "Not Found",
-        description: "The requested page was not found.",
+        description: "Page not found",
         robots: { index: false, follow: false },
       };
     }
@@ -45,16 +49,6 @@ export async function generateMetadata({ params }) {
     const description = data.data.meta_description || "Learn with us online.";
     const image = data.data.meta_image?.url || `${siteUrl}/default-og.png`;
     const canonical = `${siteUrl}/${category}/${slug}`;
-
-    // FAQ schema
-    const faqs = (data.data.faqs || []).map((faq) => ({
-      "@type": "Question",
-      name: faq.question || faq.title || "",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: asText(faq.answer || []),
-      },
-    }));
 
     return {
       title,
@@ -65,9 +59,7 @@ export async function generateMetadata({ params }) {
         description,
         url: canonical,
         siteName: "Quran Online Tutoring",
-        images: [{ url: image, alt: title, width: 1200, height: 630 }],
-        locale: "en_US",
-        type: "website",
+        images: [{ url: image, alt: title }],
       },
       twitter: {
         card: "summary_large_image",
@@ -75,28 +67,17 @@ export async function generateMetadata({ params }) {
         description,
         images: [image],
       },
-      robots: { index: true, follow: true },
-      other:
-        faqs.length > 0
-          ? {
-              "application/ld+json": JSON.stringify({
-                "@context": "https://schema.org",
-                "@type": "FAQPage",
-                mainEntity: faqs,
-              }),
-            }
-          : undefined,
     };
   } catch {
     return {
       title: "Not Found",
-      description: "The requested page was not found.",
+      description: "Page not found",
       robots: { index: false, follow: false },
     };
   }
 }
 
-// ✅ Page — Static
+// ✅ Page
 export default async function SubPage({ params }) {
   const { category, slug } = params;
   const client = createClient();
@@ -105,26 +86,19 @@ export default async function SubPage({ params }) {
   try {
     data = await client.getByUID("childcourses", slug);
 
-    // ✅ Handle missing or invalid data
-    if (!data || !data.data) {
+    if (!data?.data) return notFound();
+    if (data.data.category && data.data.category !== category) {
       return notFound();
     }
-
-    if (data.data.category && category !== data.data.category) {
-      return notFound();
-    }
-  } catch (error) {
-    console.error(error);
+  } catch {
     return notFound();
   }
 
-  // Now safe to use data.data
-  const safe = (value, fallback) => value ?? fallback;
+  const d = data.data;
 
   return (
     <div>
-      {/* Inline FAQ Schema */}
-      {data.data.faqs?.length > 0 && (
+      {d.faqs?.length > 0 && (
         <Script
           id="faq-schema"
           type="application/ld+json"
@@ -132,7 +106,7 @@ export default async function SubPage({ params }) {
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "FAQPage",
-              mainEntity: data.data.faqs.map((faq) => ({
+              mainEntity: d.faqs.map((faq) => ({
                 "@type": "Question",
                 name: faq.question || faq.title || "",
                 acceptedAnswer: {
@@ -145,43 +119,43 @@ export default async function SubPage({ params }) {
         />
       )}
 
-      <ChildHero heroo={safe(data.data.hero, {})} />
+      <ChildHero heroo={d.hero || {}} />
 
       <SessionStructure
-        session={safe(data.data.cards, [])}
-        sectionContent={safe(data.data.card_title_des, "")}
+        session={d.cards || []}
+        sectionContent={d.card_title_des || ""}
       />
 
       <ChildFeatures
-        services_sections={safe(data.data.services_sections, [])}
-        servicetitle={safe(data.data.services_title, "")}
+        services_sections={d.services_sections || []}
+        servicetitle={d.services_title || ""}
       />
 
       <WhyChooseUS
-        items={safe(data.data.why_choose_us_cards, [])}
-        title={safe(data.data.why_choose_us_title_des, "")}
+        items={d.why_choose_us_cards || []}
+        title={d.why_choose_us_title_des || ""}
       />
 
       <Testimonial
-        featuredTestimonial={safe(data.data.testimonials?.[0], {})}
-        testimonials={safe(data.data.testimonials, [])}
+        featuredTestimonial={d.testimonials?.[0] || {}}
+        testimonials={d.testimonials || []}
       />
 
       <ChildCta
-        title={safe(data.data.cta?.[0]?.title, "")}
-        description={asText(safe(data.data.cta?.[0]?.description, []))}
-        imageSrc={safe(data.data.cta?.[0]?.image?.url, "")}
+        title={d.cta?.[0]?.title || ""}
+        description={asText(d.cta?.[0]?.description || [])}
+        imageSrc={d.cta?.[0]?.image?.url || ""}
         buttonText="Get Started"
         buttonLink="/register-now"
       />
 
       <ChildCourses
-        course={safe(data.data.related_courses, [])}
-        ctitle={safe(data.uid, "")}
+        course={d.related_courses || []}
+        ctitle={data.uid}
       />
 
       <Faqs
-        faqs={(safe(data.data.faqs, [])).map((faq) => ({
+        faqs={(d.faqs || []).map((faq) => ({
           question: faq.question || faq.title || "",
           answer: asText(faq.answer || []),
         }))}
