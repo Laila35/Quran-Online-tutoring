@@ -10,6 +10,10 @@ import { ToastProvider } from "../components/ToastProvider";
 
 const inter = Inter({ subsets: ["latin"] });
 
+export const metadata = {
+  metadataBase: new URL('https://quranonlinetutoring.com'),
+};
+
 export default function RootLayout({ children }) {
   return (
     <html lang="en">

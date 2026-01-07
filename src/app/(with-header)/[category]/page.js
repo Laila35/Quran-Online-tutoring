@@ -30,6 +30,14 @@ export async function generateMetadata({ params }) {
   const { category } = params;
   const client = createClient();
 
+  if (!category) {
+    return {
+      title: "Not Found",
+      description: "The requested course was not found.",
+      robots: { index: true, follow: true },
+    };
+  }
+
   try {
     const data = await client.getByUID("maincourses", category);
 
@@ -99,6 +107,10 @@ export async function generateMetadata({ params }) {
 export default async function CategoryPage({ params }) {
   const { category } = params;
   const client = createClient();
+
+  if (!category) {
+    return notFound();
+  }
 
   try {
     const data = await client.getByUID("maincourses", category);

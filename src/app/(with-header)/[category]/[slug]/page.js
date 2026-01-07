@@ -34,6 +34,14 @@ export async function generateMetadata({ params }) {
   const { category, slug } = params;
   const client = createClient();
 
+  if (!slug) {
+    return {
+      title: "Not Found",
+      description: "Page not found",
+      robots: { index: false, follow: false },
+    };
+  }
+
   try {
     const data = await client.getByUID("childcourses", slug);
 

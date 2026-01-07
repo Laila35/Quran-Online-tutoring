@@ -142,10 +142,8 @@ const LearningOptions = () => {
               <Image
                 src={option.image}
                 alt={option.title || 'ss'}
-                width={150}
-                height={150}
-                objectFit="cover"
-                className="rounded-t-xl sm:rounded-l-xl sm:rounded-t-none"
+                fill
+                className="object-cover rounded-t-xl sm:rounded-l-xl sm:rounded-t-none"
               />
             </div>
 
